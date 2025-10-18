@@ -46,7 +46,7 @@ namespace Tickets.Datos.Controllers
                                     Direccion = drUsuarios["direccion"].ToString(),
                                     CodigoEstado = Convert.ToInt32(drUsuarios["codigoestado"]),
                                     CodigoDepto = Convert.ToInt32(drUsuarios["codigodepto"]),
-                                    Password = drUsuarios["nombredepto"].ToString(),
+                                    Password = drUsuarios["password"].ToString(),
                                     FechaCreacion = Convert.ToDateTime(drUsuarios["fechacreacion"]),
                                     FechaModificacion = Convert.ToDateTime(drUsuarios["fechamodificacion"]),
                                     UltimoLogin = Convert.ToDateTime(drUsuarios["ultimologin"])

@@ -10,20 +10,20 @@ namespace Tickets.Datos.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class DepartamentosController : ControllerBase
+    public class EstadosController : ControllerBase
     {
         private readonly IConfiguration _configuration;
-        public DepartamentosController(IConfiguration configuration)
+        public EstadosController(IConfiguration configuration)
         {
             _configuration = configuration;
         }
 
         [HttpGet]
         [Route("ObtenerCodigo/{id:int}")]
-        public async Task<List<Departamentos>> ObtenerCodigo(int id)
+        public async Task<List<Estados>> ObtenerCodigo(int id)
         {
-            string consulta = @"Select * from adm_cat_depto where codigodepto=@id";
-            List<Departamentos> lstDeptos = new List<Departamentos>();
+            string consulta = @"Select * from adm_cat_estados where codigoestado=@id";
+            List<Estados> lstEstados = new List<Estados>();
             string sqlDs = _configuration.GetConnectionString("CadenaMysql");
 
             try
@@ -35,19 +35,19 @@ namespace Tickets.Datos.Controllers
                     using (MySqlCommand mscom = new MySqlCommand(consulta, con))
                     {
                         mscom.Parameters.AddWithValue("@id", id);
-                        using (var drDepto = await mscom.ExecuteReaderAsync())
-                        { 
-                            while (drDepto.Read())
+                        using (var drEstados = await mscom.ExecuteReaderAsync())
+                        {
+                            while (drEstados.Read())
                             {
-                                lstDeptos.Add(new Departamentos
+                                lstEstados.Add(new Estados
                                 {
-                                    CodigoDepto = Convert.ToInt32(drDepto["codigodepto"]),
-                                    NombreDepto = drDepto["nombredepto"].ToString(),
-                                    DescripcionDepto = drDepto["descripciondepto"].ToString(),                                   
-                                    FechaCreacion = Convert.ToDateTime(drDepto["fechacreacion"])
+                                    CodigoEstado = Convert.ToInt32(drEstados["codigoestado"]),
+                                    NombreEstado = drEstados["nombreestado"].ToString(),
+                                    DescripcionEstado = drEstados["descripcionestado"].ToString(),
+                                    FechaCreacion = Convert.ToDateTime(drEstados["fechacreacion"])
                                 });
                             }
-                            drDepto.Close();
+                            drEstados.Close();
                             con.Close();
                         }
                     }
@@ -58,15 +58,15 @@ namespace Tickets.Datos.Controllers
                 throw new ApplicationException("An unexpected error occurred.", ex);
 
             }
-            return lstDeptos;
+            return lstEstados;
         }
 
         [HttpGet]
         [Route("Obtener")]
-        public async Task<List<Departamentos>> ObtenerTodos()
+        public async Task<List<Estados>> ObtenerTodos()
         {
-            string consulta = @"Select * from adm_cat_depto";
-            List<Departamentos> lstDepartamentos = new List<Departamentos>();
+            string consulta = @"Select * from adm_cat_estados";
+            List<Estados> lstEstados = new List<Estados>();
             string sqlDs = _configuration.GetConnectionString("CadenaMysql");
 
             try
@@ -76,21 +76,20 @@ namespace Tickets.Datos.Controllers
                     await con.OpenAsync();
                     using (MySqlCommand mscom = new MySqlCommand(consulta, con))
                     {
-                        using (var drDeptos = await mscom.ExecuteReaderAsync())
+                        using (var drEstados = await mscom.ExecuteReaderAsync())
                         {
-                            while (drDeptos.Read())
+                            while (drEstados.Read())
                             {
-                                lstDepartamentos.Add(new Departamentos
+                                lstEstados.Add(new Estados
                                 {
-                                    CodigoDepto = Convert.ToInt32(drDeptos["codigodepto"]),
-                                    NombreDepto = drDeptos["nombredepto"].ToString(),
-                                    DescripcionDepto = drDeptos["descripciondepto"].ToString(),
-                                    FechaCreacion = Convert.ToDateTime(drDeptos["fechacreacion"]),
-                                    FechaModificacion = Convert.ToDateTime(drDeptos["fechamodificacion"]),
-                                    CodigoEstado = Convert.ToInt32(drDeptos["codigoestado"])
+                                    CodigoEstado = Convert.ToInt32(drEstados["codigoestado"]),
+                                    NombreEstado = drEstados["nombreestado"].ToString(),
+                                    DescripcionEstado = drEstados["descripcionestado"].ToString(),
+                                    FechaCreacion = Convert.ToDateTime(drEstados["fechacreacion"]),
+                                    FechaModificacion = Convert.ToDateTime(drEstados["fechamodificacion"])                                  
                                 });
                             }
-                            drDeptos.Close();
+                            drEstados.Close();
                             con.Close();
                         }
                     }
@@ -101,21 +100,21 @@ namespace Tickets.Datos.Controllers
                 throw new ApplicationException("An unexpected error occurred.", ex);
 
             }
-            return lstDepartamentos;
+            return lstEstados;
         }
 
         [HttpPost]
         [Route("Crear")]
-        public async Task<bool> Crear(Departamentos departamento)
+        public async Task<bool> Crear(Estados estados)
         {
             bool blnRespuesta = true;
             string sqlDs = _configuration.GetConnectionString("CadenaMysql");
 
-            string consulta = @"Insert into adm_cat_depto(nombredepto,descripciondepto,
-                                fechacreacion, fechamodificacion, codigoestado)
+            string consulta = @"Insert into adm_cat_estados(nombreestado,
+                                descripcionestado,fechacreacion, fechamodificacion)
                                 values
-                                (@nombredepto,@descripciondepto,@fechacreacion,
-                                @fechamodificacion,@codigoestado)
+                                (@nombreestado,@descripcionestado,
+                                @fechacreacion,@fechamodificacion)
                               ";
             try
             {
@@ -124,11 +123,10 @@ namespace Tickets.Datos.Controllers
                     await con.OpenAsync();
                     using (MySqlCommand mscom = new MySqlCommand(consulta, con))
                     {
-                        mscom.Parameters.AddWithValue("@nombredepto", departamento.NombreDepto);
-                        mscom.Parameters.AddWithValue("@descripciondepto", departamento.DescripcionDepto);
+                        mscom.Parameters.AddWithValue("@nombreestado", estados.NombreEstado);
+                        mscom.Parameters.AddWithValue("@descripcionestado", estados.DescripcionEstado);
                         mscom.Parameters.AddWithValue("@fechacreacion", DateTime.Now.ToString("yyyy-MM-dd"));
-                        mscom.Parameters.AddWithValue("@fechamodificacion", departamento.FechaModificacion);
-                        mscom.Parameters.AddWithValue("@codigoestado", departamento.CodigoEstado);
+                        mscom.Parameters.AddWithValue("@fechamodificacion", estados.FechaModificacion);                       
                         mscom.CommandType = CommandType.Text;
                         blnRespuesta = await mscom.ExecuteNonQueryAsync() > 0 ? true : false;
                         con.Close();
@@ -144,19 +142,18 @@ namespace Tickets.Datos.Controllers
 
         [HttpPut]
         [Route("Editar")]
-        public async Task<bool> Editar(Departamentos departamento)
+        public async Task<bool> Editar(Estados estados)
         {
             bool blnRespuesta = true;
             string sqlDs = _configuration.GetConnectionString("CadenaMysql");
 
-            string consulta = @"Update adm_cat_clientes SET
-                                nombrecliente = @nombrecliente,
-                                apellidocliente =@apellidocliente,
-                                correo = @correo,
-                                direccion =@direccion,
-                                codigoestado=@codigoestado                                
+            string consulta = @"Update adm_cat_estados SET
+                                nombreestado = @nombreestado,
+                                descripcionestado =@descripcionestado,
+                                fechacreacion = @fechacreacion,
+                                fechamodificacion =@fechamodificacion                                                              
                                 WHERE
-                                codigocliente = @codigocliente;
+                                codigoestado = @codigoestado;
                               ";
             try
             {
@@ -165,12 +162,11 @@ namespace Tickets.Datos.Controllers
                     await con.OpenAsync();
                     using (MySqlCommand mscom = new MySqlCommand(consulta, con))
                     {
-                        mscom.Parameters.AddWithValue("@codigodepto", departamento.CodigoDepto);
-                        mscom.Parameters.AddWithValue("@nombredepto", departamento.NombreDepto);
-                        mscom.Parameters.AddWithValue("@descripciondepto", departamento.DescripcionDepto);
-                        mscom.Parameters.AddWithValue("@fechacreacion", departamento.FechaCreacion);
-                        mscom.Parameters.AddWithValue("@fechamodificacion", departamento.FechaModificacion);
-                        mscom.Parameters.AddWithValue("@codigoestado", departamento.CodigoEstado);
+                        mscom.Parameters.AddWithValue("@codigoestado", estados.CodigoEstado);
+                        mscom.Parameters.AddWithValue("@nombreestado", estados.NombreEstado);
+                        mscom.Parameters.AddWithValue("@descripcionestado", estados.DescripcionEstado);
+                        mscom.Parameters.AddWithValue("@fechacreacion", estados.FechaCreacion);
+                        mscom.Parameters.AddWithValue("@fechamodificacion", estados.FechaModificacion);                        
                         mscom.CommandType = CommandType.Text;
                         blnRespuesta = await mscom.ExecuteNonQueryAsync() > 0 ? true : false;
                         con.Close();
@@ -185,3 +181,4 @@ namespace Tickets.Datos.Controllers
         }
     }
 }
+

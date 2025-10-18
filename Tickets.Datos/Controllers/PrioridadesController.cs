@@ -19,6 +19,50 @@ namespace Tickets.Datos.Controllers
         }
 
         [HttpGet]
+        [Route("ObtenerCodigo/{id:int}")]
+        public async Task<List<Prioridades>> ObtenerCodigo(int id)
+        {
+            string consulta = @"Select * from adm_cat_prioridades where codigoprioridad=@id";
+            List<Prioridades> lstPrioridades = new List<Prioridades>();
+            string sqlDs = _configuration.GetConnectionString("CadenaMysql");
+
+            try
+            {
+                using (MySqlConnection con = new MySqlConnection(sqlDs))
+                {
+                    await con.OpenAsync();
+
+                    using (MySqlCommand mscom = new MySqlCommand(consulta, con))
+                    {
+                        mscom.Parameters.AddWithValue("@id", id);
+                        using (var drPrioridades = await mscom.ExecuteReaderAsync())
+                        {
+                            while (drPrioridades.Read())
+                            {
+                                lstPrioridades.Add(new Prioridades
+                                {
+                                    CodigoPrioridad = Convert.ToInt32(drPrioridades["codigoprioridad"]),
+                                    NombrePrioridad = drPrioridades["nombreprioridad"].ToString(),
+                                    DescripcionPrioridad = drPrioridades["descripcionprioridad"].ToString(),
+                                    NivelPrioridad = Convert.ToInt32(drPrioridades["nivelprioridad"]),
+                                    FechaCreacion = Convert.ToDateTime(drPrioridades["fechacreacion"])
+                                });
+                            }
+                            drPrioridades.Close();
+                            con.Close();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException("An unexpected error occurred.", ex);
+
+            }
+            return lstPrioridades;
+        }
+
+        [HttpGet]
         [Route("Obtener")]
         public async Task<List<Prioridades>> ObtenerTodos()
         {
@@ -40,9 +84,9 @@ namespace Tickets.Datos.Controllers
                                 lstPrioridades.Add(new Prioridades
                                 {
                                     CodigoPrioridad = Convert.ToInt32(drPrioridades["codigoprioridad"]),
-                                    NombrePrioridad = drPrioridades["nombrerol"].ToString(),
-                                    DescripcionPrioridad = drPrioridades["descripcionrol"].ToString(),
-                                    NivelPrioridad = Convert.ToInt32(drPrioridades["estado"]),
+                                    NombrePrioridad = drPrioridades["nombreprioridad"].ToString(),
+                                    DescripcionPrioridad = drPrioridades["descripcionprioridad"].ToString(),
+                                    NivelPrioridad = Convert.ToInt32(drPrioridades["nivelprioridad"]),
                                     FechaCreacion = Convert.ToDateTime(drPrioridades["fechacreacion"]),
                                     FechaModificacion = Convert.ToDateTime(drPrioridades["fechamodificacion"])
                                 });
@@ -126,9 +170,8 @@ namespace Tickets.Datos.Controllers
                         mscom.Parameters.AddWithValue("@nombreprioridad", prioridad.NombrePrioridad);
                         mscom.Parameters.AddWithValue("@descripcionprioridad", prioridad.DescripcionPrioridad);
                         mscom.Parameters.AddWithValue("@nivelprioridad", prioridad.NivelPrioridad);
-                        mscom.Parameters.AddWithValue("@fechacreacion", prioridad.FechaCreacion);
-                        mscom.Parameters.AddWithValue("@fechamodificacion", prioridad.FechaModificacion);
-                        mscom.CommandType = CommandType.Text;
+                        mscom.Parameters.AddWithValue("@fechacreacion", DateTime.Now.ToString("yyyy-MM-dd"));
+                        mscom.Parameters.AddWithValue("@fechamodificacion", DateTime.Now.ToString("yyyy-MM-dd"));
                         blnRespuesta = await mscom.ExecuteNonQueryAsync() > 0 ? true : false;
                         con.Close();
                     }
