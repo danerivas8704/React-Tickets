@@ -52,7 +52,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwaggerUI();
     app.UseSwagger();
-    
+
 }
 
 app.UseCors("NewPolicy");

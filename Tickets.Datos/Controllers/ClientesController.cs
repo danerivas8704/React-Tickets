@@ -21,6 +21,95 @@ namespace Tickets.Datos.Controllers
         }
 
         [HttpGet]
+        [Route("ObtenerC")]
+        public async Task<List<Clientes>> ObtenerTodosCombo()
+        {
+            string consulta = @"Select codigoprioridad,nombreprioridad from adm_cat_prioridades";
+            List<Clientes> lstClientes = new List<Clientes>();
+            string sqlDs = _configuration.GetConnectionString("CadenaMysql");
+
+            try
+            {
+                using (MySqlConnection con = new MySqlConnection(sqlDs))
+                {
+                    await con.OpenAsync();
+                    using (MySqlCommand mscom = new MySqlCommand(consulta, con))
+                    {
+                        using (var drClientes = await mscom.ExecuteReaderAsync())
+                        {
+                            while (drClientes.Read())
+                            {
+                                lstClientes.Add(new Clientes
+                                {
+                                    CodigoCliente = Convert.ToInt32(drClientes["codigocliente"]),
+                                    NombreCliente = drClientes["nombrecliente"].ToString()
+
+                                });
+                            }
+                            drClientes.Close();
+                            con.Close();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException("An unexpected error occurred.", ex);
+
+            }
+            return lstClientes;
+        }
+
+        [HttpDelete]
+        [Route("Eliminar/{id:int}")]
+        public async Task<IActionResult> Eliminar(int id)
+        {
+            string consulta = @"DELETE FROM adm_cat_clientes WHERE codigocliente = @id";
+            string sqlDs = _configuration.GetConnectionString("CadenaMysql");
+
+            try
+            {
+                using (MySqlConnection con = new MySqlConnection(sqlDs))
+                {
+                    await con.OpenAsync();
+
+                    using (MySqlCommand cmd = new MySqlCommand(consulta, con))
+                    {
+                        cmd.Parameters.AddWithValue("@id", id);
+
+                        int filasAfectadas = await cmd.ExecuteNonQueryAsync();
+
+                        if (filasAfectadas > 0)
+                        {
+                            return Ok(new
+                            {
+                                success = true,
+                                message = "Cliente eliminado correctamente."
+                            });
+                        }
+                        else
+                        {
+                            return NotFound(new
+                            {
+                                success = false,
+                                message = "No se encontró el cliente."
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "Ocurrió un error al eliminar el cliente.",
+                    error = ex.Message
+                });
+            }
+        }
+
+        [HttpGet]
         [Route("ObtenerCodigo/{id:int}")]
         public async Task<List<Clientes>> ObtenerCodigo(int id)
         {

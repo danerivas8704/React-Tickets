@@ -19,6 +19,96 @@ namespace Tickets.Datos.Controllers
         }
 
         [HttpGet]
+        [Route("ObtenerC")]
+        public async Task<List<Roles>> ObtenerTodosCombo()
+        {
+            string consulta = @"Select codigorol,nombrerol from adm_cat_roles";
+            List<Roles> lstRoles = new List<Roles>();
+            string sqlDs = _configuration.GetConnectionString("CadenaMysql");
+
+            try
+            {
+                using (MySqlConnection con = new MySqlConnection(sqlDs))
+                {
+                    await con.OpenAsync();
+                    using (MySqlCommand mscom = new MySqlCommand(consulta, con))
+                    {
+                        using (var drRoles = await mscom.ExecuteReaderAsync())
+                        {
+                            while (drRoles.Read())
+                            {
+                                lstRoles.Add(new Roles
+                                {
+                                    CodigoRol = Convert.ToInt32(drRoles["codigorol"]),
+                                    NombreRol = drRoles["nombrerol"].ToString()
+
+                                });
+                            }
+                            drRoles.Close();
+                            con.Close();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException("An unexpected error occurred.", ex);
+
+            }
+            return lstRoles;
+        }
+
+
+        [HttpDelete]
+        [Route("Eliminar/{id:int}")]
+        public async Task<IActionResult> Eliminar(int id)
+        {
+            string consulta = @"DELETE FROM adm_cat_roles WHERE codigorol = @id";
+            string sqlDs = _configuration.GetConnectionString("CadenaMysql");
+
+            try
+            {
+                using (MySqlConnection con = new MySqlConnection(sqlDs))
+                {
+                    await con.OpenAsync();
+
+                    using (MySqlCommand cmd = new MySqlCommand(consulta, con))
+                    {
+                        cmd.Parameters.AddWithValue("@id", id);
+
+                        int filasAfectadas = await cmd.ExecuteNonQueryAsync();
+
+                        if (filasAfectadas > 0)
+                        {
+                            return Ok(new
+                            {
+                                success = true,
+                                message = "Rol eliminado correctamente."
+                            });
+                        }
+                        else
+                        {
+                            return NotFound(new
+                            {
+                                success = false,
+                                message = "No se encontró el rol."
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "Ocurrió un error al eliminar el rol.",
+                    error = ex.Message
+                });
+            }
+        }
+
+        [HttpGet]
         [Route("Obtener")]
         public async Task<List<Roles>> ObtenerTodos()
         {

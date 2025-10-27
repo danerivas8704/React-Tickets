@@ -13,9 +13,4 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Tickets.Datos\Tickets.Datos.csproj" />
-    <ProjectReference Include="..\Tickets.Modelo\Tickets.Modelo.csproj" />
-  </ItemGroup>
-
 </Project>

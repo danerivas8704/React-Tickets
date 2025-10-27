@@ -18,6 +18,45 @@ namespace Tickets.Datos.Controllers
             _configuration = configuration;
         }
 
+        [HttpGet]
+        [Route("ObtenerC")]
+        public async Task<List<Categorias>> ObtenerTodosCombo()
+        {
+            string consulta = @"Select codigocategoria,nombrecategoria from adm_cat_categoria";
+            List<Categorias> lstCategorias = new List<Categorias>();
+            string sqlDs = _configuration.GetConnectionString("CadenaMysql");
+
+            try
+            {
+                using (MySqlConnection con = new MySqlConnection(sqlDs))
+                {
+                    await con.OpenAsync();
+                    using (MySqlCommand mscom = new MySqlCommand(consulta, con))
+                    {
+                        using (var drCategorias = await mscom.ExecuteReaderAsync())
+                        {
+                            while (drCategorias.Read())
+                            {
+                                lstCategorias.Add(new Categorias
+                                {
+                                    CodigoCategoria = Convert.ToInt32(drCategorias["codigocategoria"]),
+                                    NombreCategoria = drCategorias["nombrecategoria"].ToString()
+
+                                });
+                            }
+                            drCategorias.Close();
+                            con.Close();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException("An unexpected error occurred.", ex);
+
+            }
+            return lstCategorias;
+        }
 
         [HttpGet]
         [Route("ObtenerCodigo/{id:int}")]
@@ -62,7 +101,54 @@ namespace Tickets.Datos.Controllers
             return lstCategorias;
         }
 
+        [HttpDelete]
+        [Route("Eliminar/{id:int}")]
+        public async Task<IActionResult> EliminarCategoria(int id)
+        {
+            string consulta = @"DELETE FROM adm_cat_categoria WHERE codigocategoria = @id";
+            string sqlDs = _configuration.GetConnectionString("CadenaMysql");
 
+            try
+            {
+                using (MySqlConnection con = new MySqlConnection(sqlDs))
+                {
+                    await con.OpenAsync();
+
+                    using (MySqlCommand cmd = new MySqlCommand(consulta, con))
+                    {
+                        cmd.Parameters.AddWithValue("@id", id);
+
+                        int filasAfectadas = await cmd.ExecuteNonQueryAsync();
+
+                        if (filasAfectadas > 0)
+                        {
+                            return Ok(new
+                            {
+                                success = true,
+                                message = "Categoría eliminada correctamente."
+                            });
+                        }
+                        else
+                        {
+                            return NotFound(new
+                            {
+                                success = false,
+                                message = "No se encontró la categoría especificada."
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "Ocurrió un error al eliminar la categoría.",
+                    error = ex.Message
+                });
+            }
+        }
 
         [HttpGet]
         [Route("Obtener")]

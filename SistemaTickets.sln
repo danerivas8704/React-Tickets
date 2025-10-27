@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tickets.Datos", "Tickets.Da
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tickets.Modelo", "Tickets.Modelo\Tickets.Modelo.csproj", "{9553646A-E761-4299-965F-1F96B1DE7016}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tickets.SeguridadV1", "Tickets.SeguridadV1\Tickets.SeguridadV1.csproj", "{A441C8EE-01C5-47F1-B108-E16B9FCD1C85}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{9553646A-E761-4299-965F-1F96B1DE7016}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9553646A-E761-4299-965F-1F96B1DE7016}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9553646A-E761-4299-965F-1F96B1DE7016}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A441C8EE-01C5-47F1-B108-E16B9FCD1C85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A441C8EE-01C5-47F1-B108-E16B9FCD1C85}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A441C8EE-01C5-47F1-B108-E16B9FCD1C85}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A441C8EE-01C5-47F1-B108-E16B9FCD1C85}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -27,8 +27,8 @@ namespace Tickets.Seguridad.Controllers
 
 
         [HttpPost]
-        [Route("Registrarse")]        
-        public async Task<IActionResult>Registrarse(UsuarioDTO objeto)
+        [Route("Registrarse")]
+        public async Task<IActionResult> Registrarse(UsuarioDTO objeto)
         {
             var modeloUsuario = new Usuario
             {
@@ -55,7 +55,7 @@ namespace Tickets.Seguridad.Controllers
         {
             string consulta = @"SELECT nombreusuario, password 
                         FROM adm_cat_usuarios 
-                        WHERE codigousuario = @usuario";
+                        WHERE nombreusuario = @usuario;";
 
             string sqlDs = _configuration.GetConnectionString("CadenaMysql");
 
@@ -83,11 +83,14 @@ namespace Tickets.Seguridad.Controllers
                                         Clave = dr["password"].ToString()
                                     };
 
+                                    // 🔹 Generar el token JWT usando el método generarJWT(objeto)
+                                    var token = _utilidades.generarJWT(usuario);
                                     return Ok(new
                                     {
                                         success = true,
                                         message = "Inicio de sesión exitoso.",
-                                        data = usuario
+                                        data = usuario,
+                                        token = token
                                     });
                                 }
                                 else

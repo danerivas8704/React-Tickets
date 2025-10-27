@@ -18,6 +18,55 @@ namespace Tickets.Datos.Controllers
             _configuration = configuration;
         }
 
+        [HttpDelete]
+        [Route("Eliminar/{id:int}")]
+        public async Task<IActionResult> Eliminar(int id)
+        {
+            string consulta = @"DELETE FROM adm_cat_estados WHERE codigoestado = @id";
+            string sqlDs = _configuration.GetConnectionString("CadenaMysql");
+
+            try
+            {
+                using (MySqlConnection con = new MySqlConnection(sqlDs))
+                {
+                    await con.OpenAsync();
+
+                    using (MySqlCommand cmd = new MySqlCommand(consulta, con))
+                    {
+                        cmd.Parameters.AddWithValue("@id", id);
+
+                        int filasAfectadas = await cmd.ExecuteNonQueryAsync();
+
+                        if (filasAfectadas > 0)
+                        {
+                            return Ok(new
+                            {
+                                success = true,
+                                message = "Estado eliminado correctamente."
+                            });
+                        }
+                        else
+                        {
+                            return NotFound(new
+                            {
+                                success = false,
+                                message = "No se encontró el estado."
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "Ocurrió un error al eliminar el estado.",
+                    error = ex.Message
+                });
+            }
+        }
+
         [HttpGet]
         [Route("ObtenerCodigo/{id:int}")]
         public async Task<List<Estados>> ObtenerCodigo(int id)
