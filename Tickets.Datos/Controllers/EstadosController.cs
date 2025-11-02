@@ -12,6 +12,7 @@ namespace Tickets.Datos.Controllers
     [ApiController]
     public class EstadosController : ControllerBase
     {
+        //prueba
         private readonly IConfiguration _configuration;
         public EstadosController(IConfiguration configuration)
         {
