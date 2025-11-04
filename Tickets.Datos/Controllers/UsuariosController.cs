@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
 using System.Data;
 using System.Reflection.Metadata.Ecma335;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json.Serialization;
 using Tickets.Modelo;
 
@@ -14,6 +16,8 @@ namespace Tickets.Datos.Controllers
     public class UsuariosController : ControllerBase
     {
         private readonly IConfiguration _configuration;
+        Modelo.Utilidades.Utilidades util = new Modelo.Utilidades.Utilidades();
+
         public UsuariosController(IConfiguration configuration)
         {
             _configuration = configuration;
@@ -70,10 +74,10 @@ namespace Tickets.Datos.Controllers
 
         [HttpGet]
         [Route("ObtenerC")]
-        public async Task<List<Usuarios>> ObtenerTodosCombo()
+        public async Task<List<Catalogo>> ObtenerTodosCombo()
         {
             string consulta = @"Select codigousuario,nombreusuario from adm_cat_usuarios";
-            List<Usuarios> lstUsuarios = new List<Usuarios>();
+            List<Catalogo> lstUsuarios = new List<Catalogo>();
             string sqlDs = _configuration.GetConnectionString("CadenaMysql");
 
             try
@@ -87,10 +91,10 @@ namespace Tickets.Datos.Controllers
                         {
                             while (drUsuarios.Read())
                             {
-                                lstUsuarios.Add(new Usuarios
+                                lstUsuarios.Add(new Catalogo
                                 {
-                                    CodigoUsuario = Convert.ToInt32(drUsuarios["codigousuario"]),
-                                    NombreUsuario = drUsuarios["nombreusuario"].ToString()
+                                    Id = Convert.ToInt32(drUsuarios["codigousuario"]),
+                                    Nombre = drUsuarios["nombreusuario"].ToString()
                                     
                                 });
                             }
@@ -235,7 +239,7 @@ namespace Tickets.Datos.Controllers
                         mscom.Parameters.AddWithValue("@direccion", usuario.Direccion);
                         mscom.Parameters.AddWithValue("@codigoestado", usuario.CodigoEstado);
                         mscom.Parameters.AddWithValue("@codigodepto", usuario.CodigoDepto);
-                        mscom.Parameters.AddWithValue("@password", usuario.Password);
+                        mscom.Parameters.AddWithValue("@password", util.encriptarSHA256(usuario.Password));
                         mscom.Parameters.AddWithValue("@fechacreacion", DateTime.Now.ToString("yyyy-MM-dd"));
                         mscom.Parameters.AddWithValue("@fechamodificacion", usuario.FechaModificacion);
                         mscom.Parameters.AddWithValue("@ultimologin", usuario.UltimoLogin);

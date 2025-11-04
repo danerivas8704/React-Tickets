@@ -22,10 +22,10 @@ namespace Tickets.Datos.Controllers
 
         [HttpGet]
         [Route("ObtenerC")]
-        public async Task<List<Clientes>> ObtenerTodosCombo()
+        public async Task<List<Catalogo>> ObtenerTodosCombo()
         {
-            string consulta = @"Select codigoprioridad,nombreprioridad from adm_cat_prioridades";
-            List<Clientes> lstClientes = new List<Clientes>();
+            string consulta = @"Select codigocliente,nombrecliente from adm_cat_clientes";
+            List<Catalogo> lstClientes = new List<Catalogo>();
             string sqlDs = _configuration.GetConnectionString("CadenaMysql");
 
             try
@@ -39,10 +39,10 @@ namespace Tickets.Datos.Controllers
                         {
                             while (drClientes.Read())
                             {
-                                lstClientes.Add(new Clientes
+                                lstClientes.Add(new Catalogo
                                 {
-                                    CodigoCliente = Convert.ToInt32(drClientes["codigocliente"]),
-                                    NombreCliente = drClientes["nombrecliente"].ToString()
+                                    Id = Convert.ToInt32(drClientes["codigocliente"]),
+                                    Nombre = drClientes["nombrecliente"].ToString()
 
                                 });
                             }

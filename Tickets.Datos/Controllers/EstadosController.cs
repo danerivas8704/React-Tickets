@@ -19,6 +19,46 @@ namespace Tickets.Datos.Controllers
             _configuration = configuration;
         }
 
+        [HttpGet]
+        [Route("ObtenerC")]
+        public async Task<List<Catalogo>> ObtenerTodosCombo()
+        {
+            string consulta = @"Select codigoestado,nombreestado from adm_cat_estados";
+            List<Catalogo> lstEstados = new List<Catalogo>();
+            string sqlDs = _configuration.GetConnectionString("CadenaMysql");
+
+            try
+            {
+                using (MySqlConnection con = new MySqlConnection(sqlDs))
+                {
+                    await con.OpenAsync();
+                    using (MySqlCommand mscom = new MySqlCommand(consulta, con))
+                    {
+                        using (var drEstados = await mscom.ExecuteReaderAsync())
+                        {
+                            while (drEstados.Read())
+                            {
+                                lstEstados.Add(new Catalogo
+                                {
+                                    Id = Convert.ToInt32(drEstados["codigoestado"]),
+                                    Nombre = drEstados["nombreestado"].ToString()
+
+                                });
+                            }
+                            drEstados.Close();
+                            con.Close();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException("An unexpected error occurred.", ex);
+
+            }
+            return lstEstados;
+        }
+
         [HttpDelete]
         [Route("Eliminar/{id:int}")]
         public async Task<IActionResult> Eliminar(int id)

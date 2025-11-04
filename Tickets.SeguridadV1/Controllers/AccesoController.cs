@@ -72,10 +72,10 @@ namespace Tickets.Seguridad.Controllers
                         {
                             if (await dr.ReadAsync())
                             {
-                                string passwordDb = dr["password"].ToString();
+                                string passwordDb = dr["password"].ToString(); 
 
                                 // Validar contraseña (plaintext o con hash)
-                                if (passwordDb == objeto.Clave)
+                                if (passwordDb == _utilidades.encriptarSHA256(objeto.Clave))
                                 {
                                     var usuario = new LoginDTO
                                     {
