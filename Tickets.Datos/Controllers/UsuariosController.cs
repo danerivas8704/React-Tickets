@@ -258,7 +258,7 @@ namespace Tickets.Datos.Controllers
 
         [HttpPut]
         [Route("Cambio")]
-        public async Task<bool> CambioPass(string usuario, string password)
+        public async Task<bool> CambioPass([FromBody] CambiarPassword modelo)
         {
             bool blnRespuesta = true;
             string sqlDs = _configuration.GetConnectionString("CadenaMysql");
@@ -275,8 +275,8 @@ namespace Tickets.Datos.Controllers
                     await con.OpenAsync();
                     using (MySqlCommand mscom = new MySqlCommand(consulta, con))
                     {
-                        mscom.Parameters.AddWithValue("@nombreusuario", usuario);                      
-                        mscom.Parameters.AddWithValue("@password", password);                 
+                        mscom.Parameters.AddWithValue("@nombreusuario", modelo.Usuario);                      
+                        mscom.Parameters.AddWithValue("@password", util.encriptarSHA256(modelo.Password));                 
                         mscom.Parameters.AddWithValue("@fechamodificacion", DateTime.Now.ToString("yyyy-MM-dd"));                      
                         mscom.CommandType = CommandType.Text;
                         blnRespuesta = await mscom.ExecuteNonQueryAsync() > 0 ? true : false;
